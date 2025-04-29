@@ -76,6 +76,8 @@
                 dice.scale.set(0.1, 0.1, 0.1);
                 dice.position.y = 2;
                 scene.add(dice);
+            }, undefined, function (error) {
+                console.error('Error loading STL:', error);
             });
 
             window.addEventListener('resize', onWindowResize);
