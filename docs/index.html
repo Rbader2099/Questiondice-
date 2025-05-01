@@ -37,6 +37,7 @@
 <body>
   <button id="rollButton">Roll Dice</button>
   <canvas id="renderCanvas"></canvas>
+  <audio id="rollSound" src="dice-95077.mp3" preload="auto"></audio>
 
   <script>
     const canvas = document.getElementById('renderCanvas');
@@ -77,6 +78,10 @@
       };
 
       document.getElementById('rollButton').onclick = () => {
+        const audio = document.getElementById('rollSound');
+        audio.currentTime = 0;
+        audio.play();
+        
         if (dice) {
           const keys = Object.keys(faces);
           const chosen = keys[Math.floor(Math.random() * keys.length)];
