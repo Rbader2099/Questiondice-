@@ -14,6 +14,17 @@
       height: 100%;
       overflow: hidden;
     }
+
+    .gtac-logo {
+position: fixed; /* Keeps the logo in place when scrolling */
+top: 10px; /* Distance from the top of the page */
+right: 10px; /* Distance from the right edge */
+width: 80px; /* Adjust size as needed */
+height: auto; /* Keep aspect ratio */
+border-radius: 10px; /* Optional: soft rounded corners */
+box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* Optional: shadow for depth */
+z-index: 1000; /* Makes sure it stays on top of other elements */
+}  
     canvas {
       width: 100%;
       height: 100%;
@@ -38,7 +49,8 @@
   <button id="rollButton">Roll Dice</button>
   <canvas id="renderCanvas"></canvas>
   <audio id="rollSound" src="dice-95077.mp3" preload="auto"></audio>
-
+  <img src="GTAC.png" alt="GTAC Logo" class="gtac-logo">
+  
   <script>
     const canvas = document.getElementById('renderCanvas');
     const engine = new BABYLON.Engine(canvas, true);
