@@ -54,14 +54,12 @@
         dice = result.meshes[0];
         dice.scaling = new BABYLON.Vector3(1, 1, 1);
 
-        const boundingInfo = dice.getBoundingInfo();
-        const center = boundingInfo.boundingBox.centerWorld;
-        const radius = boundingInfo.boundingSphere.radiusWorld;
+dice.position = new BABYLON.Vector3(0, 0, 0);
 
-        dice.position = BABYLON.Vector3.Zero();
+// Manually set camera outside the cube
+camera.setTarget(BABYLON.Vector3.Zero());
+camera.setPosition(new BABYLON.Vector3(0, 0, 20));
 
-        camera.setTarget(center);
-        camera.setPosition(new BABYLON.Vector3(center.x, center.y, center.z + radius * 2));
       });
 
       document.getElementById('rollButton').onclick = () => {
