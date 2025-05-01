@@ -98,13 +98,13 @@ z-index: 1000; /* Makes sure it stays on top of other elements */
         camera.setTarget(BABYLON.Vector3.Zero());
       });
 
-      const faces = {
-  Who:   new BABYLON.Vector3(0, 0, 0),
-  What:  new BABYLON.Vector3(Math.PI / 2, 0, 0),
-  Where: new BABYLON.Vector3(Math.PI, 0, 0),
-  When:  new BABYLON.Vector3(0, Math.PI / 2, 0),
-  Why:   new BABYLON.Vector3(0, Math.PI, 0),
-  How:   new BABYLON.Vector3(0, 0, Math.PI / 2)
+    const faces = {
+  Why:   new BABYLON.Vector3(0, 0, 0),
+  How:   new BABYLON.Vector3(Math.PI / 2, 0, 0),
+  Who:   new BABYLON.Vector3(Math.PI, 0, 0),
+  What:  new BABYLON.Vector3(0, Math.PI / 2, 0),
+  Where: new BABYLON.Vector3(0, 0, Math.PI / 2),
+  When:  new BABYLON.Vector3(0, Math.PI, 0)
 };
 
 document.getElementById('rollButton').onclick = () => {
