@@ -94,14 +94,15 @@
         camera.setTarget(BABYLON.Vector3.Zero());
       });
 
-      const faces = {
-        Why:   new BABYLON.Vector3(0, 0, 0),
-        How:   new BABYLON.Vector3(Math.PI / 2, 0, 0),
-        Who:   new BABYLON.Vector3(Math.PI, 0, 0),
-        What:  new BABYLON.Vector3(0, Math.PI / 2, 0),
-        Where: new BABYLON.Vector3(0, 0, Math.PI / 2),
-        When:  new BABYLON.Vector3(0, Math.PI, 0)
-      };
+     const faces = {
+  When:  new BABYLON.Vector3(0, 0, 0),
+  How:   new BABYLON.Vector3(Math.PI / 2, 0, 0),
+  Who:   new BABYLON.Vector3(Math.PI, 0, 0),
+  Why:   new BABYLON.Vector3(0, Math.PI / 2, 0),
+  What:  new BABYLON.Vector3(0, Math.PI, 0),
+  Where: new BABYLON.Vector3(0, 0, Math.PI / 2)
+};
+
 
       document.getElementById('rollButton').onclick = () => {
         const audio = document.getElementById('rollSound');
