@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dice Face Mapper</title>
+  <script src="https://cdn.babylonjs.com/babylon.js"></script>
+  <script src="https://cdn.babylonjs.com/loaders/babylon.glTFFileLoader.min.js"></script>
+  <style>
+    html, body {
+      margin: 0;
+      height: 100%;
+      overflow: hidden;
+      background-color: #1b1b3d;
+      color: white;
+      font-family: sans-serif;
+    }
+    #rotationPanel {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: rgba(0, 0, 0, 0.8);
+      padding: 10px;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+    input[type=range] {
+      width: 100px;
+    }
+  </style>
+</head>
+<body>
+  <div id="rotationPanel">
+    <label>X: <input type="range" id="xSlider" min="0" max="6.28" step="0.01"></label><br>
+    <label>Y: <input type="range" id="ySlider" min="0" max="6.28" step="0.01"></label><br>
+    <label>Z: <input type="range" id="zSlider" min="0" max="6.28" step="0.01"></label><br>
+    <button id="logButton">Log Rotation</button>
+    <div id="faceLabel"></div>
+  </div>
+  <canvas id="renderCanvas" touch-action="none"></canvas>
+
+  <script>
+    const canvas = document.getElementById("renderCanvas");
+    const engine = new BABYLON.Engine(canvas, true);
+
+    let dice;
+    const faceLabel = document.getElementById("faceLabel");
+
+    const createScene = async () => {
+      const scene = new BABYLON.Scene(engine);
+      const camera = new BABYLON.ArcRotateCamera("camera", Math.PI / 4, Math.PI / 3, 9000, BABYLON.Vector3.Zero(), scene);
+      camera.attachControl(canvas, true);
+
+      const light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(1, 1, 0), scene);
+
+      const result = await BABYLON.SceneLoader.ImportMeshAsync("", "./", "Question_cube.glb", scene);
+      dice = result.meshes[0];
+      dice.scaling = new BABYLON.Vector3(1, 1, 1);
+      dice.position = BABYLON.Vector3.Zero();
+      dice.rotation = new BABYLON.Vector3(0, 0, 0);
+
+      return scene;
+    };
+
+    createScene().then(scene => {
+      engine.runRenderLoop(() => scene.render());
+
+      const xSlider = document.getElementById("xSlider");
+      const ySlider = document.getElementById("ySlider");
+      const zSlider = document.getElementById("zSlider");
+
+      [xSlider, ySlider, zSlider].forEach(slider => {
+        slider.addEventListener("input", () => {
+          if (dice) {
+            dice.rotation = new BABYLON.Vector3(
+              parseFloat(xSlider.value),
+              parseFloat(ySlider.value),
+              parseFloat(zSlider.value)
+            );
+          }
+        });
+      });
+
+      document.getElementById("logButton").addEventListener("click", () => {
+        if (dice) {
+          const rx = dice.rotation.x;
+          const xFace = Math.round(rx / (Math.PI / 2)) % 4;
+          const faceMap = ["When", "How", "Who", "Why"];
+          const label = faceMap[(xFace + 4) % 4];
+          console.log("Current Rotation:", dice.rotation);
+          faceLabel.innerText = `Top Face: ${label}`;
+        }
+      });
+    });
+
+    window.addEventListener("resize", () => engine.resize());
+  </script>
+</body>
+</html>
