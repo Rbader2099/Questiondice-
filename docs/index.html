@@ -6,6 +6,7 @@
   <title>3D Question Dice Roller</title>
   <script src="https://cdn.babylonjs.com/babylon.js"></script>
   <script src="https://cdn.babylonjs.com/loaders/babylon.glTFFileLoader.min.js"></script>
+  <script src="https://cdn.babylonjs.com/ammo.js"></script>
   <style>
     html, body {
       margin: 0;
@@ -35,17 +36,24 @@
       z-index: 10;
       font-size: 24px;
     }
+    #gtacLogo {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      height: 50px;
+      z-index: 10;
+    }
     canvas {
       width: 100%;
       height: 100%;
       display: block;
     }
   </style>
-  <link href="./Figtree-Bold.otf" rel="stylesheet" type="font/otf">
 </head>
 <body>
   <button id="rollButton">Roll Dice</button>
   <div id="resultLabel">You rolled: </div>
+  <img id="gtacLogo" src="gtac.png" alt="GTAC Logo">
   <canvas id="renderCanvas"></canvas>
   <audio id="rollSound" src="dice-95077.mp3"></audio>
 
@@ -67,59 +75,65 @@
 
     const createScene = async () => {
       const scene = new BABYLON.Scene(engine);
+      scene.enablePhysics(new BABYLON.Vector3(0, -9.81, 0), new BABYLON.AmmoJSPlugin());
+
       const camera = new BABYLON.ArcRotateCamera("camera", Math.PI / 4, Math.PI / 3, 9000, BABYLON.Vector3.Zero(), scene);
       camera.attachControl(canvas, true);
       camera.lowerRadiusLimit = 2000;
       camera.upperRadiusLimit = 10000;
 
       new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 1, 0), scene);
+
       const result = await BABYLON.SceneLoader.ImportMeshAsync("", "./", "Question_cube.glb", scene);
       dice = result.meshes[0];
       dice.scaling = new BABYLON.Vector3(1, 1, 1);
       dice.rotation = new BABYLON.Vector3(0, 0, 0);
+
+      dice.physicsImpostor = new BABYLON.PhysicsImpostor(
+        dice,
+        BABYLON.PhysicsImpostor.BoxImpostor,
+        { mass: 1, restitution: 0.6, friction: 0.5 },
+        scene
+      );
+
+      const ground = BABYLON.MeshBuilder.CreateGround("ground", { width: 200, height: 200 }, scene);
+      ground.position.y = -100;
+      ground.physicsImpostor = new BABYLON.PhysicsImpostor(
+        ground,
+        BABYLON.PhysicsImpostor.BoxImpostor,
+        { mass: 0, restitution: 0.5 },
+        scene
+      );
+
       return scene;
     };
 
-    function getClosestLabel(targetRot) {
-      let minDist = Infinity;
-      let matchedLabel = "Unknown";
-      for (const { label, rotation } of faceRotations) {
-        const dx = Math.abs(targetRot.x - rotation.x);
-        const dz = Math.abs(targetRot.z - rotation.z);
-        const dist = dx + dz;
-        if (dist < minDist) {
-          minDist = dist;
-          matchedLabel = label;
-        }
-      }
-      return matchedLabel;
+    function getClosestLabel(rotation) {
+      // Placeholder logic
+      return "?";
     }
 
     document.getElementById("rollButton").addEventListener("click", () => {
       if (!dice) return;
       rollSound.play();
 
-      const choice = faceRotations[Math.floor(Math.random() * faceRotations.length)];
-      const spinX = 3 + Math.floor(Math.random() * 2);
-      const spinZ = 3 + Math.floor(Math.random() * 2);
-
-      const targetRotation = new BABYLON.Vector3(
-        choice.rotation.x + Math.PI * 2 * spinX,
-        0,
-        choice.rotation.z + Math.PI * 2 * spinZ
+      dice.physicsImpostor.setLinearVelocity(
+        new BABYLON.Vector3(
+          (Math.random() - 0.5) * 20,
+          Math.random() * 20 + 10,
+          (Math.random() - 0.5) * 20
+        )
       );
 
-      BABYLON.Animation.CreateAndStartAnimation("rotateDice", dice, "rotation", 60, 90, dice.rotation, targetRotation, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
+      dice.physicsImpostor.setAngularVelocity(
+        new BABYLON.Vector3(
+          (Math.random() - 0.5) * 10,
+          (Math.random() - 0.5) * 10,
+          (Math.random() - 0.5) * 10
+        )
+      );
 
-      setTimeout(() => {
-        const normalized = new BABYLON.Vector3(
-          targetRotation.x % (Math.PI * 2),
-          0,
-          targetRotation.z % (Math.PI * 2)
-        );
-        const label = getClosestLabel(normalized);
-        resultLabel.textContent = `You rolled: ${label}`;
-      }, 1600);
+      resultLabel.textContent = "You rolled..."; // Add logic for face detection when stable
     });
 
     createScene().then(scene => {
