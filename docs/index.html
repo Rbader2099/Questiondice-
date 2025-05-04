@@ -144,10 +144,35 @@ document.getElementById('rollButton').onclick = () => {
 
     document.getElementById('rollResult').style.visibility = "hidden";
 
-    scene.beginAnimation(dice, 0, totalFrames, false, 1, () => {
-      document.getElementById('rollResult').textContent = "You rolled: " + chosen;
-      document.getElementById('rollResult').style.visibility = "visible";
-    });
+    
+scene.beginAnimation(dice, 0, totalFrames, false, 1, () => {
+  const x = +(dice.rotation.x % (Math.PI * 2)).toFixed(2);
+  const z = +(dice.rotation.z % (Math.PI * 2)).toFixed(2);
+
+  const norm = angle => angle < 0 ? angle + Math.PI * 2 : angle;
+
+  const nx = norm(x);
+  const nz = norm(z);
+
+  let resultText = "Unknown";
+
+  if ((nx >= 1.4 && nx <= 1.6)) {
+    resultText = "How";
+  } else if ((nx >= 3.1 && nx <= 3.3)) {
+    resultText = "Who";
+  } else if ((nx >= 4.7 && nx <= 4.9)) {
+    resultText = "Why";
+  } else if ((nx < 0.2 || nx > 6.0)) {
+    if (nz >= 1.5 && nz <= 1.7) resultText = "Where";
+    else if (nz >= 3.0 && nz <= 3.3) resultText = "Who";
+    else if (nz >= 4.6 && nz <= 4.8) resultText = "What";
+    else resultText = "When";
+  }
+
+  document.getElementById('rollResult').textContent = "You rolled: " + resultText;
+  document.getElementById('rollResult').style.visibility = "visible";
+});
+
   }
 };
 
