@@ -104,42 +104,59 @@
     }
 
     document.getElementById("rollButton").addEventListener("click", () => {
-      if (!dice) return;
-      rollSound.play();
+  if (!dice) return;
+  rollSound.play();
 
-      let choice, targetRotation, normalized;
-      const currentLabel = getClosestLabel(dice.rotation);
+  let choice, targetRotation, normalized;
+  const currentLabel = getClosestLabel(dice.rotation);
 
-      do {
-        choice = faceRotations[Math.floor(Math.random() * faceRotations.length)];
-        const spinX = 2 + Math.floor(Math.random() * 4);
-        const spinY = 1 + Math.floor(Math.random() * 4);
-        const spinZ = 2 + Math.floor(Math.random() * 4);
+  do {
+    choice = faceRotations[Math.floor(Math.random() * faceRotations.length)];
+    const spinX = 2 + Math.floor(Math.random() * 4);
+    const spinY = 1 + Math.floor(Math.random() * 4);
+    const spinZ = 2 + Math.floor(Math.random() * 4);
 
-        targetRotation = new BABYLON.Vector3(
-          choice.rotation.x + Math.PI * 2 * spinX,
-          Math.PI * 2 * spinY,
-          choice.rotation.z + Math.PI * 2 * spinZ
-        );
+    targetRotation = new BABYLON.Vector3(
+      choice.rotation.x + Math.PI * 2 * spinX,
+      Math.PI * 2 * spinY,
+      choice.rotation.z + Math.PI * 2 * spinZ
+    );
 
-        normalized = new BABYLON.Vector3(
-          targetRotation.x % (Math.PI * 2),
-          0,
-          targetRotation.z % (Math.PI * 2)
-        );
-      } while (getClosestLabel(normalized) === currentLabel);
+    normalized = new BABYLON.Vector3(
+      targetRotation.x % (Math.PI * 2),
+      0,
+      targetRotation.z % (Math.PI * 2)
+    );
+  } while (getClosestLabel(normalized) === currentLabel);
 
-      BABYLON.Animation.CreateAndStartAnimation(
-        "rotateDice", dice, "rotation",
-        60, 180, dice.rotation, targetRotation,
-        BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT
-      );
+  // Create quaternion animations for natural motion
+  const startQuat = BABYLON.Quaternion.FromEulerVector(dice.rotation);
+  const endQuat = BABYLON.Quaternion.FromEulerVector(targetRotation);
 
-      setTimeout(() => {
-        const label = getClosestLabel(normalized);
-        resultLabel.textContent = `You rolled: ${label}`;
-      }, 3000);
-    });
+  const animation = new BABYLON.Animation(
+    "diceQuatAnim",
+    "rotationQuaternion",
+    60,
+    BABYLON.Animation.ANIMATIONTYPE_QUATERNION,
+    BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT
+  );
+
+  animation.setEasingFunction(new BABYLON.CubicEase().setEasingMode(BABYLON.EasingFunction.EASINGMODE_EASEINOUT));
+  animation.setKeys([
+    { frame: 0, value: startQuat },
+    { frame: 180, value: endQuat }
+  ]);
+
+  dice.rotationQuaternion = startQuat;
+  dice.animations = [animation];
+  dice.getScene().beginAnimation(dice, 0, 180, false);
+
+  setTimeout(() => {
+    const label = getClosestLabel(normalized);
+    resultLabel.textContent = `You rolled: ${label}`;
+  }, 3000);
+});
+
 
     createScene().then(scene => {
       engine.runRenderLoop(() => scene.render());
