@@ -1,0 +1,3 @@
+Futures Updates: 
+1. Highlight the text on the dice face or upload a model
+2 OR colour the dice 
