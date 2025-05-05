@@ -83,7 +83,7 @@ z-index: 1000; /* Makes sure it stays on top of other elements */
         BABYLON.Vector3.Zero(),
         scene
       );
-      camera.attachControl(canvas, true);
+      camera.attachControl(canvas, false);
       camera.lowerRadiusLimit = 2000;
       camera.upperRadiusLimit = 10000;
 
