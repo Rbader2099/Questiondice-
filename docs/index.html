@@ -83,10 +83,14 @@ z-index: 1000; /* Makes sure it stays on top of other elements */
         BABYLON.Vector3.Zero(),
         scene
       );
-      camera.attachControl(canvas, false);
-      camera.lowerRadiusLimit = 2000;
-      camera.upperRadiusLimit = 10000;
-      camera.rebuildAnglesAndRadius();
+     camera.lowerRadiusLimit = 2000;
+camera.upperRadiusLimit = 10000;
+
+camera.attachControl(canvas, true); // allow init only
+scene.onAfterRenderObservable.addOnce(() => {
+  camera.rebuildAnglesAndRadius(); // force update after first frame
+  camera.detachControl(canvas);    // block user interaction
+});
 
       const light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(1, 1, 0), scene);
 
